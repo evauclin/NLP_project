@@ -5,6 +5,10 @@
 /data/
 *.csv
 
+# poetry stuff
+poetry.lock
+pyproject.toml
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
