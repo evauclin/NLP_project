@@ -11,20 +11,20 @@ def cli():
 
 
 @click.command()
-@click.option("--input_filename", default="data/raw/train.csv", help="File training data")
+@click.option("--input_filename", default="data/raw/data.csv", help="File training data")
 @click.option("--model_dump_filename", default="models/dump.json", help="File to dump model")
 def train(input_filename, model_dump_filename):
-    df = make_dataset(input_filename)
-    X, y = make_features(df)
+    df_train, df_test = make_dataset(input_filename)
+    X_train, y_train = make_features(df_train, df_test)
 
     model = make_model()
-    model.fit(X, y)
+    model.fit(X_train, y_train)
 
     return joblib.dump(model, model_dump_filename)
 
 
 @click.command()
-@click.option("--input_filename", default="data/raw/train.csv", help="File training data")
+@click.option("--input_filename", default="data/raw/test.csv", help="File training data")
 @click.option("--model_dump_filename", default="models/dump.json", help="File to dump model")
 @click.option("--output_filename", default="data/processed/prediction.csv", help="Output file for predictions")
 def predict(input_filename, model_dump_filename, output_filename):
@@ -33,7 +33,7 @@ def predict(input_filename, model_dump_filename, output_filename):
 
 
 @click.command()
-@click.option("--input_filename", default="data/raw/train.csv", help="File training data")
+@click.option("--input_filename", default="data/raw/data.csv", help="File training data")
 def evaluate(input_filename):
     # Read CSV
     df = make_dataset(input_filename)
