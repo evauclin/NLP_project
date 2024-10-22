@@ -4,19 +4,16 @@ import spacy
 from sklearn.feature_extraction.text import CountVectorizer
 from gensim.models import Word2Vec
 import numpy as np
+import pandas as pd
 
 
-def process_text_lematization(text, nlp):
-    print("download before loading")
-    nlp = spacy.load('fr_core_news_md')
-    print("download after loading")
+def process_text_lematization(text , nlp):
     stop_words = nlp.Defaults.stop_words
-    return " ".join([token.lemma_ for token in nlp(text)
+    return " ".join([token.lemma_.lower() for token in nlp(text)
                      if token.text.lower() not in stop_words and not token.is_punct])
 def process_text_stemming(text, nlp):
-    nlp = spacy.load('fr_core_news_md')
     stop_words = nlp.Defaults.stop_words
-    return " ".join([token.lemma_ for token in nlp(text)
+    return " ".join([token.lemma_.lower() for token in nlp(text)
                      if token.text.lower() not in stop_words and not token.is_punct])
 
 def apply_CountVectorizer(X_train, X_test):
@@ -49,18 +46,16 @@ def make_features(df_train, df_test):
     subprocess.run(["python", "-m", "spacy", "download", "fr_core_news_md"])
 
     nlp = spacy.load('fr_core_news_md')
-    df_train["video_name_lematized"] = df_train["video_name"].apply(process_text_lematization)
+    df_train["video_name_lematized"] = df_train["video_name"].apply(lambda x: process_text_lematization(x, nlp))
 
 
-    # Appliquer le même traitement sur le jeu de test
-    df_test["video_name_lematized"] = df_test["video_name"].apply(process_text_lematization)
+    df_test["video_name_lematized"] = df_test["video_name"].apply(lambda x: process_text_lematization(x, nlp))
 
     y_train = df_train["label"]
-    y_test = df_test["label"]
-    print('data before vectorization')
-    X_train , X_test = apply_word2vec(df_train["video_name_lematized"], df_test["video_name_lematized"])
-    print('data after vectorization')
+    X_train_to_vec , X_test_to_vec = apply_word2vec(df_train["video_name_lematized"], df_test["video_name_lematized"])
 
-    print(X_test)
+    np.save("./data/raw/X_train.npy", X_train_to_vec)
 
-    return X_train, y_train
+
+
+    return X_train_to_vec, y_train
