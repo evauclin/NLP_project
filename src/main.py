@@ -14,17 +14,20 @@ def cli():
 @click.option("--input_filename", default="data/raw/data.csv", help="File training data")
 @click.option("--model_dump_filename", default="models/dump.json", help="File to dump model")
 def train(input_filename, model_dump_filename):
-    df = make_dataset(input_filename)
-    X, y = make_features(df)
+    print("Loading data...")
+    df_train, df_test = make_dataset(input_filename)
+    print("Data loaded")
+    X_train, y_train = make_features(df_train, df_test)
+    print("Features created")
 
     model = make_model()
-    model.fit(X, y)
+    model.fit(X_train, y_train)
 
     return joblib.dump(model, model_dump_filename)
 
 
 @click.command()
-@click.option("--input_filename", default="data/raw/data.csv", help="File training data")
+@click.option("--input_filename", default="data/raw/test.csv", help="File training data")
 @click.option("--model_dump_filename", default="models/dump.json", help="File to dump model")
 @click.option("--output_filename", default="data/processed/prediction.csv", help="Output file for predictions")
 def predict(input_filename, model_dump_filename, output_filename):
