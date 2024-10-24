@@ -42,20 +42,23 @@ def apply_word2vec(X_train, X_test):
     return X_train_vect, X_test_vect
 
 
-def make_features(df_train, df_test):
+def make_features(df_input, df_test=None, is_training=True):
+    """
+    Prépare les features pour l'entraînement ou la prédiction.
+    """
     subprocess.run(["python", "-m", "spacy", "download", "fr_core_news_md"])
-
     nlp = spacy.load('fr_core_news_md')
-    df_train["video_name_lematized"] = df_train["video_name"].apply(lambda x: process_text_lematization(x, nlp))
 
-
-    df_test["video_name_lematized"] = df_test["video_name"].apply(lambda x: process_text_lematization(x, nlp))
-
-    y_train = df_train["label"]
-    X_train_to_vec , X_test_to_vec = apply_word2vec(df_train["video_name_lematized"], df_test["video_name_lematized"])
-
-    np.save("./data/raw/X_train.npy", X_train_to_vec)
-
-
-
-    return X_train_to_vec, y_train
+    if is_training:
+        # Mode entraînement (comportement original)
+        df_input["video_name_lematized"] = df_input["video_name"].apply(lambda x: process_text_lematization(x, nlp))
+        df_test["video_name_lematized"] = df_test["video_name"].apply(lambda x: process_text_lematization(x, nlp))
+        y_train = df_input["label"]
+        X_train_to_vec, X_test_to_vec = apply_word2vec(df_input["video_name_lematized"], df_test["video_name_lematized"])
+        np.save("src/data/raw/X_train.npy", X_train_to_vec)
+        return X_train_to_vec, y_train
+    else:
+        # Mode prédiction
+        df_input["video_name_lematized"] = df_input["video_name"].apply(lambda x: process_text_lematization(x, nlp))
+        X_vec, _ = apply_word2vec(df_input["video_name_lematized"], df_input["video_name_lematized"])
+        return X_vec
