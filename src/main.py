@@ -69,9 +69,8 @@ def predict(input_filename, model_dump_filename, output_filename):
     df_test = pd.read_csv(input_filename)
 
     print("Préparation des features...")
-    X_test = make_features(df_test)
-    #X_test = np.load("src/data/raw/X_test.npy",allow_pickle=True)
-    # Faire les prédictions
+    X_test = np.load("src/data/raw/X_test.npy")
+
     print("Génération des prédictions...")
     predictions = model.predict(X_test)
 
