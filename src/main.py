@@ -5,6 +5,9 @@ from data import make_dataset
 from feature import make_features
 from models import make_model
 
+from sklearn.model_selection import cross_val_score
+import numpy as np
+
 @click.group()
 def cli():
     pass
@@ -36,21 +39,25 @@ def predict(input_filename, model_dump_filename, output_filename):
 @click.option("--input_filename", default="data/raw/data.csv", help="File training data")
 def evaluate(input_filename):
     # Read CSV
-    df = make_dataset(input_filename)
 
-    # Make features (tokenization, lowercase, stopwords, stemming...)
-    X, y = make_features(df)
+    df_train, df_test = make_dataset(input_filename)
+    X_train, y_train = make_features(df_train, df_test)
 
-    # Object with .fit, .predict methods
+
     model = make_model()
+    model.fit(X_train, y_train)
+
 
     # Run k-fold cross validation. Print results
-    return evaluate_model(model, X, y)
+    return evaluate_model(model, X_train, y_train)
 
 
-def evaluate_model(model, X, y):
-    # Run k-fold cross validation. Print results
-    pass
+def evaluate_model(model, X, y, cv=5):
+    scores = cross_val_score(model, X, y, cv=cv)
+    print(f"Scores pour chaque pli (fold): {scores}")
+    print(f"Score moyen : {np.mean(scores)}")
+
+    return scores
 
 
 cli.add_command(train)
