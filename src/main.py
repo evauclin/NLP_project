@@ -2,10 +2,13 @@ import os
 import click
 import joblib
 import pandas as pd
+import numpy as np
 
+from sklearn.metrics import accuracy_score
 from data import make_dataset
 from feature import make_features
 from models import make_model
+
 
 def ensure_dir(file_path):
     """Create directory if it doesn't exist"""
@@ -39,12 +42,12 @@ def train(input_filename, model_dump_filename):
 @click.command()
 @click.option(
     "--input_filename",
-    default="src/data/raw/data.csv",
+    default="src/data/raw/test.csv",
     help="File training data"
 )
 @click.option(
     "--model_dump_filename",
-    default="src/model/dump.json",  # Updated to match your structure
+    default="src/model/dump.json",
     help="File to dump model"
 )
 @click.option(
@@ -54,34 +57,31 @@ def train(input_filename, model_dump_filename):
 )
 
 def predict(input_filename, model_dump_filename, output_filename):
-    """
-    Fait des prédictions sur de nouvelles données en utilisant le modèle entraîné.
-    """
-    # Assurer que le répertoire de sortie existe
+
     ensure_dir(output_filename)
 
-    # Charger le modèle
+
     print(f"Chargement du modèle depuis {model_dump_filename}")
     model = joblib.load(model_dump_filename)
 
-    # Charger et préparer les données de test
+
     print(f"Chargement des données depuis {input_filename}")
     df_test = pd.read_csv(input_filename)
 
-    # Préparation des features pour la prédiction
     print("Préparation des features...")
-    X_test = make_features(df_test, is_training=False)
-
+    X_test = make_features(df_test)
+    #X_test = np.load("src/data/raw/X_test.npy",allow_pickle=True)
     # Faire les prédictions
     print("Génération des prédictions...")
     predictions = model.predict(X_test)
 
-    # Créer un DataFrame avec les prédictions
     results = pd.DataFrame({
         'id': df_test.index,
-        'video_name': df_test['video_name'],
-        'prediction': predictions
+        'prediction': predictions,
+        'label': df_test.label
     })
+
+    print("Accuracy test : ", accuracy_score(results['prediction'], results['label']))
 
     # Sauvegarder les prédictions
     print(f"Sauvegarde des prédictions dans {output_filename}")
