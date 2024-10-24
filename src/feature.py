@@ -54,7 +54,7 @@ def make_features(df_train, df_test):
     y_train = df_train["label"]
     X_train_to_vec , X_test_to_vec = apply_word2vec(df_train["video_name_lematized"], df_test["video_name_lematized"])
 
-    np.save("./data/raw/X_train.npy", X_train_to_vec)
+    np.save("src/data/raw/X_train.npy", X_train_to_vec)
 
 
 

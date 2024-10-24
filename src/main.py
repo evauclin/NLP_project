@@ -36,7 +36,7 @@ def predict(input_filename, model_dump_filename, output_filename):
 
 
 @click.command()
-@click.option("--input_filename", default="data/raw/data.csv", help="File training data")
+@click.option("--input_filename", default="src/data/raw/data.csv", help="File training data")
 def evaluate(input_filename):
     # Read CSV
 
@@ -48,7 +48,6 @@ def evaluate(input_filename):
     model.fit(X_train, y_train)
 
 
-    # Run k-fold cross validation. Print results
     return evaluate_model(model, X_train, y_train)
 
 
