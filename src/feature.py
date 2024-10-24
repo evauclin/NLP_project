@@ -48,11 +48,13 @@ def make_features(df_input, df_test=None):
 
     df_input["video_name_lematized"] = df_input["video_name"].apply(lambda x: process_text_lematization(x, nlp))
     df_test["video_name_lematized"] = df_test["video_name"].apply(lambda x: process_text_lematization(x, nlp))
+
     y_train = df_input["label"]
     X_train_to_vec, X_test_to_vec = apply_word2vec(df_input["video_name_lematized"], df_test["video_name_lematized"])
     #X_train_to_vec, X_test_to_vec = apply_CountVectorizer(df_input["video_name_lematized"], df_test["video_name_lematized"])
     np.save("src/data/raw/X_train.npy", X_train_to_vec)
     np.save("src/data/raw/X_test.npy", X_test_to_vec)
     return X_train_to_vec, y_train
+
 
 

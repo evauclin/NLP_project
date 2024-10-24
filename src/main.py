@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import cross_val_score
+
 from data import make_dataset
 from feature import make_features
 from models import make_model
@@ -15,6 +17,7 @@ def ensure_dir(file_path):
     directory = os.path.dirname(file_path)
     if directory and not os.path.exists(directory):
         os.makedirs(directory)
+
 
 @click.group()
 def cli():
@@ -90,24 +93,28 @@ def predict(input_filename, model_dump_filename, output_filename):
     return results
 
 @click.command()
-@click.option(
-    "--input_filename",
-    default="src/data/raw/data.csv",
-    help="File training data"
-)
+@click.option("--input_filename", default="src/data/raw/data.csv", help="File training data")
 def evaluate(input_filename):
     # Read CSV
-    df = make_dataset(input_filename)
-    # Make features (tokenization, lowercase, stopwords, stemming...)
-    X, y = make_features(df)
-    # Object with .fit, .predict methods
-    model = make_model()
-    # Run k-fold cross validation. Print results
-    return evaluate_model(model, X, y)
 
-def evaluate_model(model, X, y):
-    # Run k-fold cross validation. Print results
-    pass
+    df_train, df_test = make_dataset(input_filename)
+    X_train, y_train = make_features(df_train, df_test)
+
+
+    model = make_model()
+    model.fit(X_train, y_train)
+
+
+    return evaluate_model(model, X_train, y_train)
+
+
+def evaluate_model(model, X, y, cv=5):
+    scores = cross_val_score(model, X, y, cv=cv)
+    print(f"Scores pour chaque pli (fold): {scores}")
+    print(f"Score moyen : {np.mean(scores)}")
+
+    return scores
+
 
 cli.add_command(train)
 cli.add_command(predict)
