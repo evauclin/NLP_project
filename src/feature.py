@@ -60,7 +60,7 @@ def apply_word2vec(X_train, X_test):
     return X_train_vect, X_test_vect
 
 
-def make_features(df_input, df_test=None):
+def make_features(df_input, df_test):
     subprocess.run(["python", "-m", "spacy", "download", "fr_core_news_md"])
     nlp = spacy.load("fr_core_news_md")
 

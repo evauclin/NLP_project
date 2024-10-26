@@ -93,10 +93,8 @@ def evaluate(input_filename):
     df_train, df_test = make_dataset(input_filename)
     X_train, y_train = make_features(df_train, df_test)
 
-
     model = make_model()
     model.fit(X_train, y_train)
-
 
     return evaluate_model(model, X_train, y_train)
 
