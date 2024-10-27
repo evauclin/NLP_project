@@ -43,7 +43,7 @@ def cli():
 
 @click.command()
 @click.option(
-    "--input_filename", default="src/data/raw/data.csv", help="Path to the training data file"
+    "--input_filename", default="src/data/raw/train.csv", help="Path to the training data file"
 )
 @click.option(
     "--model_dump_filename",
@@ -79,7 +79,7 @@ def train(input_filename: str, model_dump_filename: str) -> None:
     default="src/data/processed/prediction.csv",
     help="Path to save predictions"
 )
-def predict(input_filename: str, model_dump_filename: str, output_filename: str) :
+def predict(input_filename: str, model_dump_filename: str, output_filename: str) -> None:
     """
     Loads a model and test data, performs predictions, and saves results to a file.
 
@@ -106,6 +106,8 @@ def predict(input_filename: str, model_dump_filename: str, output_filename: str)
         X_test_transformed = load_vectorizer_and_transform(
             df_test["video_name"], process_text_lemmatization
         )
+    else:
+        raise ValueError(f"Invalid encoder type: {encoder}")
 
     # Predict and save results
     predictions = model.predict(X_test_transformed)
@@ -123,7 +125,7 @@ def predict(input_filename: str, model_dump_filename: str, output_filename: str)
 
 @click.command()
 @click.option(
-    "--input_filename", default="src/data/raw/data.csv", help="Path to the data file for evaluation"
+    "--input_filename", default="src/data/raw/train.csv", help="Path to the data file for evaluation"
 )
 def evaluate(input_filename: str) -> List[float]:
     """
@@ -144,7 +146,7 @@ def evaluate(input_filename: str) -> List[float]:
     return scores
 
 
-def evaluate_model(model, X: np.ndarray, y: np.ndarray, cv: int = 5) -> List[float]:
+def evaluate_model(model, X: np.ndarray, y: np.ndarray, cv: int = 5) -> None:
     """
     Evaluates the model with cross-validation.
 
@@ -160,7 +162,6 @@ def evaluate_model(model, X: np.ndarray, y: np.ndarray, cv: int = 5) -> List[flo
     scores = cross_val_score(model, X, y, cv=cv)
     print(f"Scores per fold: {scores}")
     print(f"Mean score: {np.mean(scores):.2f}")
-    return scores.tolist()
 
 
 cli.add_command(train)
