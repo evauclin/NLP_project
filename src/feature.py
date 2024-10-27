@@ -1,14 +1,13 @@
 import subprocess
 
+import joblib
 import numpy as np
 import spacy
 from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-import joblib
 
 subprocess.run(["python", "-m", "spacy", "download", "fr_core_news_md"])
 nlp = spacy.load("fr_core_news_md")
-
 
 
 def process_text_lematization(text):
